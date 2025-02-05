@@ -4,6 +4,8 @@ import { AuthContext, FirebaseContext } from "../store/Context";
 import { getAuth } from "firebase/auth";
 import ListView from "../pages/listView";
 import BoardView from "../pages/boardView";
+import userImage from "../assets/images/userImage.png"
+import TaskModal from "../pages/taskModal";
 
 const Header: React.FunctionComponent = () => {
   const authContext = useContext(AuthContext);
@@ -11,7 +13,8 @@ const Header: React.FunctionComponent = () => {
 
   const [searchQuery, setSearchQuery] = useState("");
   const [activeView, setActiveView] = useState<'list' | 'board'>('list');
-  const [isMobile, setIsMobile] = useState(false); // Track screen size
+  const [isMobile, setIsMobile] = useState(false)
+  const [isModalOpen,setModalOPen] =useState(false)
 
   if (!authContext || !firebaseContext) {
     return <p>Loading...</p>;
@@ -121,7 +124,7 @@ const Header: React.FunctionComponent = () => {
             />
 
             <button
-              onClick={() => console.log("Add Task clicked")}
+              onClick={() => setModalOPen(true)}
               className="bg-purple-700 text-white px-4 py-2 rounded-3xl mt-4 sm:mt-0 sm:ml-4 hover:bg-green-700 w-full sm:w-auto"
             >
               Add Task
@@ -138,6 +141,7 @@ const Header: React.FunctionComponent = () => {
           <BoardView />
         )}
       </div>
+      <TaskModal isOpen={isModalOpen} onClose={()=>setModalOPen(false)}/>
     </div>
   );
 };
