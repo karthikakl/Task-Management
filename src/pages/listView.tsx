@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { useState } from 'react';
 import EditModal from './editModal';
+import ConfirmModal from './confirmModal'; // Import your ConfirmModal component
 
 interface IListViewProps {}
 
@@ -9,7 +10,9 @@ const ListView: React.FunctionComponent<IListViewProps> = (props) => {
   const [isTaskListOpen, setIsTaskListOpen] = React.useState(false);
   const [isInProgressOpen, setIsInProgressOpen] = React.useState(false);
   const [isCompletedOpen, setIsCompletedOpen] = React.useState(false);
-  const [isModalOpen,setModalOPen] =useState(false)
+  const [isModalOpen, setModalOpen] = useState(false); // Edit Modal
+  const [isConfirmModalOpen, setConfirmModalOpen] = useState(false); // Confirm Modal
+  const [selectedTask, setSelectedTask] = useState<string | null>(null); // Selected task for deletion
 
   const [isMenuOpen, setIsMenuOpen] = React.useState<number | null>(null); // State to track which task's menu is open
 
@@ -21,6 +24,27 @@ const ListView: React.FunctionComponent<IListViewProps> = (props) => {
   // Toggle for task options menu
   const toggleMenu = (index: number) => {
     setIsMenuOpen(isMenuOpen === index ? null : index);
+  };
+
+  // Handle delete confirmation
+  const handleDeleteClick = (task: string) => {
+    setSelectedTask(task);
+    setConfirmModalOpen(true); // Open the confirmation modal
+  };
+
+  // Handle confirmation of deletion
+  const handleConfirmDelete = () => {
+    if (selectedTask) {
+      console.log(`${selectedTask} deleted!`);
+      setConfirmModalOpen(false); // Close the confirmation modal
+      setSelectedTask(null); // Reset the selected task
+    }
+  };
+
+  // Handle cancellation of deletion
+  const handleCancelDelete = () => {
+    setConfirmModalOpen(false);
+    setSelectedTask(null);
   };
 
   return (
@@ -63,8 +87,13 @@ const ListView: React.FunctionComponent<IListViewProps> = (props) => {
                   </button>
                   {isMenuOpen === index && (
                     <div className="absolute right-2 top-8 bg-white border border-gray-300 shadow-lg rounded-md">
-                      <button  className="block text-blue-500 py-1">Edit</button>
-                      <button className="block text-red-500 py-1">Delete</button>
+                      <button className="block text-blue-500 py-1">Edit</button>
+                      <button 
+                        onClick={() => handleDeleteClick(task)}
+                        className="block text-red-500 py-1"
+                      >
+                        Delete
+                      </button>
                     </div>
                   )}
                 </li>
@@ -106,9 +135,13 @@ const ListView: React.FunctionComponent<IListViewProps> = (props) => {
                   </button>
                   {isMenuOpen === index && (
                     <div className="absolute right-2 top-8 bg-white border border-gray-300 shadow-lg rounded-md">
-                      <button onClick={()=>setModalOPen(true)}
-                      className="block hover:bg-slate-500 bg-gray-800 text-white py-2 px-3">Edit</button>
-                      <button className="block hover:bg-slate-500 bg-red-600 text-white py-2 px-2">Delete</button>
+                      <button onClick={() => setModalOpen(true)} className="block hover:bg-slate-500 bg-gray-800 text-white py-2 px-3">Edit</button>
+                      <button
+                        onClick={() => handleDeleteClick(task)}
+                        className="block hover:bg-slate-500 bg-red-600 text-white py-2 px-2"
+                      >
+                        Delete
+                      </button>
                     </div>
                   )}
                 </li>
@@ -120,7 +153,7 @@ const ListView: React.FunctionComponent<IListViewProps> = (props) => {
 
       {/* Completed Dropdown */}
       <div className="border rounded-lg shadow-md">
-        <div className="flex rounded-lg justify-between items-center bg-[#CEFFCC] p-2 sm:p-2 md:p-2 lg:p-2">
+        <div className={"flex rounded-lg justify-between items-center bg-[#CEFFCC] p-2 sm:p-2 md:p-2 lg:p-2"}>
           <button
             className={"font-medium w-full text-left"}
             onClick={toggleCompleted}
@@ -151,7 +184,12 @@ const ListView: React.FunctionComponent<IListViewProps> = (props) => {
                   {isMenuOpen === index && (
                     <div className="absolute right-0 bg-white border rounded shadow-md p-2">
                       <button className="block text-blue-500 py-1">Edit</button>
-                      <button className="block text-red-500 py-1">Delete</button>
+                      <button
+                        onClick={() => handleDeleteClick(task)}
+                        className="block text-red-500 py-1"
+                      >
+                        Delete
+                      </button>
                     </div>
                   )}
                 </li>
@@ -160,7 +198,16 @@ const ListView: React.FunctionComponent<IListViewProps> = (props) => {
           </div>
         )}
       </div>
-      <EditModal isOpen={isModalOpen} onClose={()=>setModalOPen(false)}/>
+
+      {/* Edit Modal */}
+      <EditModal isOpen={isModalOpen} onClose={() => setModalOpen(false)} />
+
+      {/* Confirm Delete Modal */}
+      <ConfirmModal
+        isOpen={isConfirmModalOpen}
+        onClose={handleCancelDelete}
+        onConfirm={handleConfirmDelete}
+      />
     </div>
   );
 };

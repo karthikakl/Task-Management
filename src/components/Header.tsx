@@ -7,6 +7,7 @@ import BoardView from "../pages/boardView";
 import userImage from "../assets/images/userImage.png"
 import TaskModal from "../pages/taskModal";
 
+
 const Header: React.FunctionComponent = () => {
   const authContext = useContext(AuthContext);
   const firebaseContext = useContext(FirebaseContext);
